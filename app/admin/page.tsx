@@ -5,12 +5,21 @@ import { todos } from "@/database/schema"
 
 import { Button } from "@/components/ui/button"
 import { deleteTodo } from "@/actions/todos"
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 
 export const dynamic = 'force-dynamic'
 
 export default async function AdminPage() {
     
-    /* YOUR AUTHORIZATION CHECK HERE */
+    const session = await auth.api.getSession({
+        headers: await headers()
+    })
+
+    if (session === null) {
+        // if user is not authenticated, return placeholder
+        return <h1 className="text-2xl font-bold mb-6">Please sign in</h1>;
+    }
 
     const allTodos = await db.query.todos.findMany({
         with: {
