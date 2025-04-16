@@ -5,8 +5,8 @@ import { todos } from "@/database/schema"
 
 import { Button } from "@/components/ui/button"
 import { deleteTodo } from "@/actions/todos"
-import { auth } from "@/lib/auth";
-import { headers } from "next/headers";
+import { auth } from "@/lib/auth"
+import { headers } from "next/headers"
 
 export const dynamic = 'force-dynamic'
 
