@@ -16,7 +16,7 @@ export default async function AdminPage() {
         headers: await headers()
     })
 
-    if (session === null) {
+    if (!session) {
         // if user is not authenticated, return placeholder
         return <h1 className="text-2xl font-bold mb-6">Please sign in</h1>;
     }
