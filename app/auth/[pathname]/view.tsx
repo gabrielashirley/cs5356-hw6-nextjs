@@ -2,13 +2,15 @@
 
 import { AuthCard } from "@daveyplate/better-auth-ui"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { useEffect } from "react"
 
 import { cn } from "@/lib/utils"
 
 export function AuthView({ pathname }: { pathname: string }) {
     const router = useRouter()
+    const searchParams = useSearchParams()
+    const redirectTo = searchParams.get("redirectTo") || "/"
 
     useEffect(() => {
         router.refresh()
@@ -16,7 +18,7 @@ export function AuthView({ pathname }: { pathname: string }) {
 
     return (
         <main className="flex grow flex-col items-center justify-center gap-3 p-4">
-            <AuthCard pathname={pathname} />
+            <AuthCard pathname={pathname} redirectTo={redirectTo}/>
 
             <p
                 className={cn(

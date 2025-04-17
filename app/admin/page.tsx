@@ -11,7 +11,6 @@ import { headers } from "next/headers"
 export const dynamic = 'force-dynamic'
 
 export default async function AdminPage() {
-    
     const session = await auth.api.getSession({
         headers: await headers()
     })
@@ -19,6 +18,11 @@ export default async function AdminPage() {
     if (!session) {
         // if user is not authenticated, return placeholder
         return <h1 className="text-2xl font-bold mb-6">Please sign in</h1>;
+    }
+
+    // if user is not admin, return null
+    if (session?.user?.role !== "admin") {
+        return null;
     }
 
     const allTodos = await db.query.todos.findMany({

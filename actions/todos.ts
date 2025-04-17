@@ -1,6 +1,6 @@
 "use server"
 
-import { eq, and } from "drizzle-orm"
+import { eq, and, sql } from "drizzle-orm"
 import { headers } from "next/headers"
 import { revalidatePath } from "next/cache"
 
@@ -57,16 +57,18 @@ export async function toggleTodo(id: string): Promise<TodoState & { completed?: 
     }
 
     try {
-        // update todo with a single query that also checks ownership
+        // single DB query that updates the todo only if owned by the user
         const result = await db.update(todos)
-          .set({ completed: !todos.completed }) // toggle the completed status
-          .where(
-            and(
-              eq(todos.id, id),
-              eq(todos.userId, session.user.id)
+            .set({ 
+                completed: sql`NOT ${todos.completed}` // toggle directly in SQL
+            })
+            .where(
+                and(
+                    eq(todos.id, id),
+                    eq(todos.userId, session.user.id) // only allow the todo's creator to toggle
+                )
             )
-          )
-          .returning();
+            .returning();
         
         // if no rows were updated, the todo doesn't exist or doesn't belong to the user
         if (!result) {
@@ -75,17 +77,30 @@ export async function toggleTodo(id: string): Promise<TodoState & { completed?: 
         
         revalidatePath("/todos");
         return { success: true, completed: result[0].completed };
-      } catch (error) {
+    } catch (error) {
         console.error("Toggle todo error:", error);
         return { error: "Failed to update todo" };
-      }
+    }
 }
 
-export async function deleteTodo(formData: FormData) {
-    /* YOUR AUTHORIZATION CHECK HERE */
-    const id = formData.get("id") as string;
-    await db.delete(todos)
-        .where(eq(todos.id, id));
+export async function deleteTodo(formData: FormData): Promise<void> {
+    const session = await auth.api.getSession({
+      headers: await headers()
+    });
+    
+    // only admin can delete todos
+    if (!session?.user || session.user.role !== "admin") {
+      throw new Error("Unauthorized");
+    }
 
-    revalidatePath("/admin");
+    try {
+      const id = formData.get("id") as string;
+      await db.delete(todos)
+          .where(eq(todos.id, id));
+
+      revalidatePath("/admin");
+    } catch (error) {
+      console.error("Delete todo error:", error);
+      throw new Error("Failed to delete todo");
+    }
 }
