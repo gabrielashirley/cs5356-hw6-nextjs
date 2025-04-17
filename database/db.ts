@@ -1,8 +1,4 @@
-// Import dotenv only in development
-if (process.env.NODE_ENV !== 'production') {
-  // Dynamic import for development only
-  require('dotenv').config();
-}
+import "dotenv/config"
 
 import { neonConfig, Pool } from '@neondatabase/serverless';
 import { drizzle } from 'drizzle-orm/neon-serverless';
