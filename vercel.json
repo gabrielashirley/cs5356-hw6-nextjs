@@ -1,5 +1,7 @@
 {
   "framework": "nextjs",
-  "buildCommand": "pnpm install && NODE_OPTIONS=--max_old_space_size=4096 pnpm build",
-  "installCommand": "pnpm install"
-} 
+  "buildCommand": "pnpm install --frozen-lockfile && pnpm run build",
+  "devCommand": "pnpm run dev",
+  "installCommand": "pnpm install --frozen-lockfile",
+  "outputDirectory": ".next"
+}
