@@ -6,11 +6,10 @@ import { Button } from "./ui/button"
 import { AdminNavEntry } from "./AdminNavEntry"
 import { useEffect, useState } from "react"
 import { authClient } from "@/lib/auth-client"
-import { useRouter, usePathname } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 
 export function Header() {
     const [isAdmin, setIsAdmin] = useState(false);
-    const router = useRouter();
     const pathname = usePathname();
 
     // check admin status
